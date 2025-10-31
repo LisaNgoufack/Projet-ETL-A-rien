@@ -6,14 +6,14 @@ Pipeline ETL temps‑réel pour collecter, transformer et visualiser des donnée
 
 Ce projet vise à mettre en place un pipeline de données temps‑réel capable de :
 
-* Collecter des informations sur les aéroports depuis l’API **OpenAIP** et publier ces messages dans un topic Kafka via un flux NiFi (voir `nifi/NiFi_Flow.json`).
+* Collecter des informations sur les aéroports depuis l’API **OpenAIP** et publier ces messages dans un topic Kafka via un flux NiFi.
 * Traiter ces données avec Apache Spark (Batch ou Structured Streaming) : parse du JSON, nettoyage des coordonnées, calcul de statistiques et écriture dans une base PostgreSQL.
 * Mettre à disposition les enregistrements nettoyés et agrégés pour la visualisation dans Grafana.
 * Orchestrer l’ensemble des services grâce à un fichier Docker Compose.
 
 ## Architecture
 
-* **Flux NiFi** (`nifi/NiFi_Flow.json`) : chaîne de processeurs qui interroge l’API OpenAIP via `InvokeHTTP`, découpe la réponse JSON avec `SplitJson`, extrait les champs id, name, icao, lon et lat avec `EvaluateJsonPath`, convertit ces attributs en JSON via `AttributesToJSON` et publie les messages dans Kafka grâce à `PublishKafka_2_0` (clé de message : `${id}`, topic : `airports`). Astuce : si vous utilisez `PublishKafkaRecord_2_0`, renseignez `Message Key Field=/id` et assurez‑vous que le `RecordReader` lit un objet (et non un tableau) ; sinon, préférez `PublishKafka_2_0` avec `Kafka Key=${id}`.
+* **Flux NiFi**  : chaîne de processeurs qui interroge l’API OpenAIP via `InvokeHTTP`, découpe la réponse JSON avec `SplitJson`, extrait les champs id, name, icao, lon et lat avec `EvaluateJsonPath`, convertit ces attributs en JSON via `AttributesToJSON` et publie les messages dans Kafka grâce à `PublishKafka_2_0` (clé de message : `${id}`, topic : `airports`). Astuce : si vous utilisez `PublishKafkaRecord_2_0`, renseignez `Message Key Field=/id` et assurez‑vous que le `RecordReader` lit un objet (et non un tableau) ; sinon, préférez `PublishKafka_2_0` avec `Kafka Key=${id}`.
 * **Apache NiFi** : outil d’orchestration des flux qui exécute le flux décrit ci‑dessus.
 * **Kafka** : message broker qui reçoit les données des aéroports et les met à disposition pour Spark.
 * **Spark** : deux scripts sont fournis :
@@ -50,7 +50,7 @@ Ce projet vise à mettre en place un pipeline de données temps‑réel capable 
 
 3. **Configurer le flux NiFi**
 
-   * Ouvrez l’interface NiFi (port 8080 dans le docker‑compose) et importez le flux fourni `nifi/NiFi_Flow.json`.
+   * Ouvrez l’interface NiFi (port 8080 dans le docker‑compose) et importez le flux fourni.
    * Le flux interrogera automatiquement l’API OpenAIP et publiera les messages dans le topic Kafka `airports`.
 
 4. **Traiter les données avec Spark**
@@ -85,7 +85,7 @@ Ce projet vise à mettre en place un pipeline de données temps‑réel capable 
 | Fichier / Dossier           | Rôle                                                                                                           |
 | --------------------------- | -------------------------------------------------------------------------------------------------------------- |
 | `nifi_conf/`                | Configuration éventuelle pour des flux NiFi.                                                                   |
-| `nifi/NiFi_Flow.json`       | Export du flux NiFi pour interroger OpenAIP et publier les messages dans Kafka.                               |
+| `nifi_data/tp.xml`       | Export du flux NiFi pour interroger OpenAIP et publier les messages dans Kafka.                               |
 | `spark-jars/`               | Jars supplémentaires pour Spark (Kafka, PostgreSQL).                                                           |
 | `docker-compose-M2DATA.yml` | Définit les services Docker (Kafka, Spark, PostgreSQL, Grafana, etc.).                                         |
 | `spark_airports_final.py`   | Traitement Spark batch : lecture du topic Kafka, parsing, nettoyage, statistiques et écriture dans PostgreSQL. |
