@@ -1,4 +1,4 @@
-# Projet ETL A rien
+# Projet ETL aerien
 
 Pipeline ETL temps‑réel pour collecter, transformer et visualiser des données aéronautiques en s’appuyant sur Kafka, NiFi, Spark, PostgreSQL et Grafana.
 
