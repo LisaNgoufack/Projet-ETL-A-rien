@@ -1,7 +1,4 @@
 
-
-# Créer le nouveau script avec les bonnes permissions
-docker exec -it spark-worker bash -c 'cat > /tmp/spark_airports_final.py << "EOF"
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import *
 from pyspark.sql.types import *
